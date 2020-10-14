@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from "react";
-import { withRouter, Redirect } from "react-router";
+import { withRouter, Redirect } from "react-router-dom";
 import app from '../auth/base'
 import { AuthContext } from "../auth"
 

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {Redirect, withRouter} from "react-router";
+import {Redirect, withRouter} from "react-router-dom";
 import app from '../auth/base'
 import * as firebase from "firebase";
 
