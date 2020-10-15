@@ -1,10 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
-const getOrdersForRestaurant = require("../../controller/restaurant/restaurant");
+const addItemToMenu = require('../../controller/restaurant/addItemToMenu')
+const getItems = require('../../controller/restaurant/getItems')
+const getPastOrdersDetails = require('../../controller/restaurant/getPastOrdersDetails')
 
-// route to get
-router.get('/:id', async (req, res) => { res.send(await getOrdersForRestaurant(req.params.id)) })
+// to add a food item to the menu
+router.post('/addItem', async (req, res) => { res.send(await addItemToMenu(req.body)) })
 
+// show items from a restaurant
+router.get('/get_items/:restaurantId', async (req, res) => { res.send(await getItems(req.params.restaurantId)) })
+
+// view list of customers and whatever that has been ordered by them ie order details
+router.get('/get_sale_history_details/:access_token', async (req, res) => { res.send(await getPastOrdersDetails(req.params.access_token)) })
 
 module.exports = router

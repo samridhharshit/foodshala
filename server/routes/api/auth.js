@@ -7,6 +7,6 @@ const login = require("../../controller/auth/login")
 // register user/restaurant
 router.post('/register', async (req, res) => { res.send(await register(req.body)) })
 
-// logging in a user/restaurant
-router.post('/login', async (req, res) => { res.send(await login(req.body)) })
+// logging in a user/restaurant - put request
+router.put('/login', async (req, res) => { res.send(await login(req.body)) })
 module.exports = router
