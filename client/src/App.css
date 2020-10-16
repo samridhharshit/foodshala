@@ -36,3 +36,124 @@
     transform: rotate(360deg);
   }
 }
+
+html,
+body {
+  overflow-x: hidden;
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+}
+
+/* navbar */
+
+.login-signup {
+  border: 1px solid;
+  border-radius: 2px;
+  background: transparent;
+}
+
+.title {
+  padding-bottom: 0;
+  border-bottom: 1px solid #000;
+}
+
+.login-signup:hover {
+  background: #ffffff;
+}
+
+/* menu page */
+.login{
+  padding: 2%;
+  margin-top: 10%;
+}
+.registration{
+  margin-top: 7.5%;
+  position: center;
+}
+.list_story_header{
+  padding-top: 5%;
+  padding-bottom: 5%;
+  position: -webkit-sticky; /* Safari & IE */
+  position: sticky;
+  top: 0;
+  background: white;
+}
+.story_container{
+  padding: 1%
+}
+.card-body{
+  text-overflow:ellipsis;
+
+}
+.view_icon{
+  display: inline-block;
+}
+.view_text{
+  display: inline-block;
+}
+.reading_icon {
+  display: inline-block;
+  margin-left: 1%;
+}
+.reading_text{
+  display: inline-block
+}
+.text{
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+
+}
+.homelink{
+  text-decoration: none;
+  background-color: transparent;
+  border-bottom: 3px solid #f1e8ae;
+  color: inherit;
+}
+.homelink:hover{
+  color: #0056b3;
+  border-bottom: 3px solid #f1e8ae;
+  text-decoration: none;
+}
+
+.logo{
+  display: inline-block;
+}
+
+.log-out{
+  display: inline-block;
+  float: right;
+}
+
+.restaurant-collection-footer-button {
+  background: transparent;
+  float: right;
+  color: #0056b3;
+}
+
+.footer-button {
+  border: 1px solid;
+  border-radius: 2px;
+  background: transparent;
+  float: right;
+}
+
+.add-dish {
+  background: #806924;
+}
+
+.add-dish:hover {
+  background: #0056b3;
+}
+
+.input-group {
+  display: inline-flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}

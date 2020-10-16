@@ -9,9 +9,10 @@ const Login = ({ history }) => {
             event.preventDefault();
             const { email, password } = event.target.elements;
             try {
-                await app
+                const data = await app
                     .auth()
                     .signInWithEmailAndPassword(email.value, password.value);
+                console.log(data.user.providerData[0])
                 history.push("/");
             } catch (error) {
                 alert(error);

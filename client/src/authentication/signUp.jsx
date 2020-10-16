@@ -9,9 +9,13 @@ const SignUp = ({ history }) => {
         event.preventDefault();
         const { email, password } = event.target.elements;
         try {
-            await app
+            const data = await app
                 .auth()
                 .createUserWithEmailAndPassword(email.value, password.value);
+            if (data !== undefined) {
+
+            }
+            console.log(data)
             history.push("/");
         } catch (error) {
             alert(error);
