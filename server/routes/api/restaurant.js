@@ -5,7 +5,6 @@ const addItemToMenu = require('../../controller/restaurant/addItemToMenu')
 const getItems = require('../../controller/restaurant/getItems')
 const getPastOrdersDetails = require('../../controller/restaurant/getPastOrdersDetails')
 const getAllRestaurants = require("../../controller/restaurant/getAllRestaurants");
-const getRestaurantDetails = require("../../controller/restaurant/getRestaurantDetails");
 
 // get all restaurants
 router.get('/', async (req, res) => { res.send(await getAllRestaurants()) })
@@ -18,9 +17,6 @@ router.get('/get_items/:restaurantId', async (req, res) => { res.send(await getI
 
 // view list of customers and whatever that has been ordered by them ie order details
 router.get('/get_sale_history_details/:access_token', async (req, res) => { res.send(await getPastOrdersDetails(req.params.access_token)) })
-
-// get restaurant details using access_token
-router.get('/get_restaurant_details/:access_token', async (req, res) => {res.send(await getRestaurantDetails(req.params.access_token))})
 
 
 module.exports = router

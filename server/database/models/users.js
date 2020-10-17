@@ -6,7 +6,7 @@ const userSchema = schema({
     email: String,
     access_token: String,
     type: String,
-    food_preference: Array
+    food_type: Array
 })
 
 const user = mongoose.model("users", userSchema)

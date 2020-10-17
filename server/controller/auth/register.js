@@ -2,6 +2,7 @@ const user = require('../../database/models/users')
 const restaurant = require('../../database/models/restaurant')
 
 const register = async (credentials) => {
+    console.log(credentials)
     const isARestaurant = await restaurant.find({email: credentials.email})
     const isAUser = await user.find({email: credentials.email})
     if (credentials.type === "user") {
