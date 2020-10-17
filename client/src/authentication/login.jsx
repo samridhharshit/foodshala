@@ -1,9 +1,12 @@
-import React, { useCallback, useContext } from "react";
-import { withRouter, Redirect } from "react-router-dom";
+import React, {useCallback, useContext, useState} from "react";
+import {withRouter, Redirect, Link} from "react-router-dom";
 import app from '../auth/base'
 import { AuthContext } from "../auth"
 
 const Login = ({ history }) => {
+
+    const [loading, setLoading] = useState(false)
+
     const handleLogin = useCallback(
         async event => {
             event.preventDefault();
@@ -28,19 +31,38 @@ const Login = ({ history }) => {
     }
 
     return (
-        <div>
-            <h1>Log in</h1>
+        <div className="container col-6 align-content-center registration">
+            <h1>Can't wait to see you on the other side!</h1>
             <form onSubmit={handleLogin}>
-                <label>
-                    Email
-                    <input name="email" type="email" placeholder="Email" />
-                </label>
-                <label>
-                    Password
-                    <input name="password" type="password" placeholder="Password" />
-                </label>
-                <button type="submit">Log in</button>
+                <div className="form-group input-group">
+                    <label htmlFor="email">Email address</label>
+                    <input
+                        name="email"
+                        type="email"
+                        id="email"
+                        aria-describedby="emailHelp"
+                        required={true}
+                    />
+                </div>
+                <div className="form-group input-group">
+                    <label htmlFor="p1">Password</label>
+                    <input
+                        name="p1"
+                        type="password"
+                        id="password"
+                        required={true}
+                    />
+                </div>
+                {
+                    loading ? (
+                        <button type="submit" className="btn btn-primary">logging you in...</button>
+                    ) : (
+                        <button type="submit" className="btn btn-primary">Login</button>
+                    )
+                }
             </form>
+            <br />
+            <p>Don't have an account? No worries, <Link to={'/signup'}>Click here </Link>to register..</p>
         </div>
     );
 };

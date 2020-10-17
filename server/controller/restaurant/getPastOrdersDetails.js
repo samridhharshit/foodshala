@@ -8,7 +8,11 @@ const items = require('../../database/models/items')
 const getPastOrdersDetails = async (restaurant_access_token) => {
 
     // check if token exists or not ie user is logged in or not
-    if (restaurant_access_token === null || restaurant_access_token === undefined || restaurant_access_token === "") {
+    if (
+        restaurant_access_token === null ||
+        restaurant_access_token === undefined ||
+        restaurant_access_token === ""
+    ) {
         return {
             status: 403,
             message: "Access forbidden. Login first"

@@ -185,3 +185,10 @@ body {
   justify-content: flex-start;
   align-items: center;
 }
+
+.logout-cart {
+  width: 200px;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center
+}

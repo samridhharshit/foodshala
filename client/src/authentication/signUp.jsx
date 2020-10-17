@@ -6,13 +6,15 @@ import axios from 'axios'
 
 import { connect } from 'react-redux'
 
-const SignUp = ({ history }) => {
+const SignUp = (props) => {
 
     const [loading, setLoading] = useState(false)
+    const [redirectToMainPage, setRedirectToMainPage] = useState(false)
 
     const handleSignUp = useCallback(async event => {
         event.preventDefault();
         const { fullName, email, p1, p2, type, desc, veg, non_veg } = event.target.elements;
+
         const foodTypeArray = []
         if (veg.value === "yes") {
             foodTypeArray.push("veg")
@@ -20,17 +22,20 @@ const SignUp = ({ history }) => {
         if (non_veg.value === "yes") {
             foodTypeArray.push("non-veg")
         }
-        console.log(fullName.value, email.value, p1.value, p2.value, type.value, desc.value, veg.value, non_veg.value)
+
+        // console.log(fullName.value, email.value, p1.value, p2.value, type.value, desc.value, veg.value, non_veg.value)
         if (p1.value === p2.value) {
             try {
-                const data = await app
+                await app
                     .auth()
                     .createUserWithEmailAndPassword(email.value, p1.value);
-                const currentUser = firebase.auth().currentUser
-                if (!data) {
+
+                const currentUser = await firebase.auth().currentUser
+                if (!currentUser) {
                     alert('signup unsuccessful! Contact the developer...')
-                    history.push('/')
+                    window.location.reload()
                 } else if (type.value === 'restaurant') {
+
                     const signupObjectForRestaurant = {
                         name: fullName.value,
                         email: email.value,
@@ -39,8 +44,15 @@ const SignUp = ({ history }) => {
                         food_type: foodTypeArray,
                         desc: desc.value
                     }
+
                     const response = await axios.post('/api/auth/register', signupObjectForRestaurant)
-                    console.log(response)
+                    if (response.data.status === 200) {
+                        props.mountUserToStore(response.data.data)
+                        setRedirectToMainPage(true)
+                    } else {
+                        await firebase.auth().signOut()
+                        alert('signup failed! try again..')
+                    }
                 } else if (type.value === 'user') {
                     const signupObjectForUser= {
                         name: fullName.value,
@@ -49,19 +61,24 @@ const SignUp = ({ history }) => {
                         type: "user",
                         food_type: foodTypeArray
                     }
-                    const response = await axios.post('/api/auth/register', signupObjectForUser)
-                    console.log(response)
-                }
 
-                console.log(data)
-                history.push("/");
+                    const response = await axios.post('/api/auth/register', signupObjectForUser)
+                    if (response.data.status === 200) {
+                        props.mountUserToStore(response.data.data)
+                        setRedirectToMainPage(true)
+                    } else {
+                        await firebase.auth().signOut()
+                        alert('signup failed! try again..')
+                    }
+                }
+                window.location.reload()
             } catch (error) {
                 alert(error);
             }
         } else {
-            alert("password does not match!")
+            alert("password did not match!")
         }
-    }, [history]);
+    }, [props.currentlyLoggedIn]);
 
     if (firebase.auth().currentUser !== null) {
         return <Redirect to={'/'} />
@@ -169,15 +186,13 @@ const SignUp = ({ history }) => {
     );
 };
 
-const mapStateToProps = (state) => {
-
-}
-
 const mapDispatchToProps = (dispatch) => {
-
+    return {
+        mountUserToStore: (user) => { dispatch({ type: "MOUNT_USER", user }) }
+    }
 }
 
 export default withRouter(
-    connect(mapStateToProps, mapDispatchToProps)
+    connect(null, mapDispatchToProps)
     (SignUp)
 );
