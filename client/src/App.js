@@ -13,14 +13,14 @@ import RestaurantMenu from "./modules/restaurant";
 function App() {
   return (
       <AuthProvider>
-          <Navigation />
           <Router>
+              <Navigation />
               <Switch>
                   {/*<PrivateRoute exact path="/" component={Home} />*/}
-                  <Route exact path="/login" component={Login} />
-                  <Route exact path="/signup" component={SignUp} />
+                  <Route path="/login" component={Login} />
+                  <Route path="/signup" component={SignUp} />
                   <Route exact path="/" component={Home} /> // landing page route
-                  <Route exact path="/restaurant/:id" component={RestaurantMenu} />
+                  <Route path="/restaurant/:id" component={RestaurantMenu} />
                   <Redirect to={'/'} />
               </Switch>
           </Router>

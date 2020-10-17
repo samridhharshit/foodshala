@@ -15,7 +15,13 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     if(pending){
-        return <>Loading...</>
+        return (
+            <div className="container col-lg-9 align-content-center">
+                <div className="list_story_header fixed-top">
+                    <h1 className={'homelink logo'}>Loading...</h1>
+                </div>
+            </div>
+        )
     }
 
     return (

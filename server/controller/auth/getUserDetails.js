@@ -1,6 +1,6 @@
-const restaurants = require('../../database/models/restaurant')
+const users = require('../../database/models/users')
 
-const getRestaurantDetails = async (access_token) => {
+const getUserDetails = async (access_token) => {
     // check if token exists or not ie user is logged in or not
     if (access_token === null ||
         access_token === undefined ||
@@ -13,14 +13,17 @@ const getRestaurantDetails = async (access_token) => {
     }
 
     // check if access token is correct
-    const restaurant = await restaurants.findOne({access_token: access_token})
-    if (!restaurant) {
+    const user = await users.findOne({access_token: access_token})
+    if (!user) {
         return {
             status: 404,
             message: "Access token invalid."
         }
     }
-    return restaurant
+    return {
+        status: 200,
+        data: user
+    }
 }
 
-module.exports = getRestaurantDetails
+module.exports = getUserDetails

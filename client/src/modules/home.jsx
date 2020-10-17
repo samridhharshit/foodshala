@@ -1,17 +1,19 @@
 import React, {useEffect, useState} from "react";
 import axios from 'axios'
-import {Redirect} from "react-router";
 import { Link } from "react-router-dom";
+import * as firebase from "firebase";
+import Navigation from "./navigation";
 
 const Home = () => {
     const [loading, setLoading] = useState(true)
     const [restaurants, setRestaurants] = useState(null)
+    const [currentUser, setCurrentUser] = useState(null)
 
     useEffect(() => {
         async function getAllRestaurants() {
-            const resposne = await axios.get('/api/restaurant')
-            if (resposne.status === 200) {
-                await setRestaurants(resposne.data)
+            const response = await axios.get('/api/restaurant')
+            if (response.status === 200) {
+                await setRestaurants(response.data)
                 setLoading(false)
             }
         }
@@ -49,12 +51,16 @@ const Home = () => {
                                     <div className="card-footer">
                                         {
                                             restaurant.food_type && restaurant.food_type.includes("veg") ? (
-                                                <img src="https://img.icons8.com/fluent/24/000000/vegetarian-food-symbol.png"/>
+                                                <img src="https://img.icons8.com/fluent/24/000000/vegetarian-food-symbol.png"
+                                                     alt="veg"
+                                                />
                                             ) : null
                                         }
                                         {
                                             restaurant.food_type && restaurant.food_type.includes("non-veg") ? (
-                                                <img src="https://img.icons8.com/fluent/24/000000/non-vegetarian-food-symbol.png"/>
+                                                <img src="https://img.icons8.com/fluent/24/000000/non-vegetarian-food-symbol.png"
+                                                     alt="non-veg"
+                                                />
                                             ) : null
                                         }
                                         <Link
