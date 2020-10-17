@@ -1,9 +1,12 @@
-import React, {useCallback, useContext, useState} from "react";
+import React, { useCallback, useContext, useState } from "react";
 import {withRouter, Redirect, Link} from "react-router-dom";
 import app from '../auth/base'
 import { AuthContext } from "../auth"
+import * as firebase from "firebase";
+import { connect } from "react-redux";
+import axios from 'axios';
 
-const Login = ({ history }) => {
+const Login = (props) => {
 
     const [loading, setLoading] = useState(false)
 
@@ -11,17 +14,37 @@ const Login = ({ history }) => {
         async event => {
             event.preventDefault();
             const { email, password } = event.target.elements;
+
+            await setLoading(true)
             try {
                 const data = await app
                     .auth()
                     .signInWithEmailAndPassword(email.value, password.value);
-                console.log(data.user.providerData[0])
-                history.push("/");
+
+                const currentUser = await firebase.auth().currentUser
+                const loginObject = {
+                    email: email.value,
+                    access_token: await currentUser.getIdToken()
+                }
+                const response = await axios.put('/api/auth/login', loginObject)
+                console.log(response)
+                if (response.data.status === 200) {
+                    if (response.data.data.type === "user") {
+                        props.mountUserAfterLogin(response.data.data)
+                    } else {
+                        props.mountRestaurantAfterLogin(response.data.data)
+                    }
+                } else {
+                    await firebase.auth().signOut()
+                    alert(response.data.message)
+                }
+                window.location.reload()
             } catch (error) {
                 alert(error);
             }
+            setLoading(false)
         },
-        [history]
+        []
     );
 
     const { currentUser } = useContext(AuthContext);
@@ -45,9 +68,9 @@ const Login = ({ history }) => {
                     />
                 </div>
                 <div className="form-group input-group">
-                    <label htmlFor="p1">Password</label>
+                    <label htmlFor="password">Password</label>
                     <input
-                        name="p1"
+                        name="password"
                         type="password"
                         id="password"
                         required={true}
@@ -67,4 +90,23 @@ const Login = ({ history }) => {
     );
 };
 
-export default withRouter(Login);
+const mapStateToProps = (state) => {
+    return {
+        user: state.user,
+        restaurant: state.restaurant,
+        cart: state.cart,
+        currentlyLoggedIn: state.currentlyLoggedIn
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        mountUserAfterLogin: (user) => { dispatch({ type: "MOUNT_USER", user }) },
+        mountRestaurantAfterLogin: (restaurant) => { dispatch({ type: "MOUNT_RESTAURANT", restaurant }) }
+    }
+}
+
+export default withRouter(
+    connect(mapStateToProps, mapDispatchToProps)
+    (Login)
+);

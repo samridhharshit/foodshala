@@ -15,9 +15,15 @@ const login = async (credentials) => {
                 message: "No Valid user found!"
             }
         }
-        return await restaurant.find({email: credentials.email})
+        return {
+            status: 200,
+            data: await restaurant.find({email: credentials.email})
+        }
     }
-    return await user.find({email: credentials.email})
+    return{
+      status: 200,
+      data: await user.find({email: credentials.email})
+    }
 }
 
 module.exports = login

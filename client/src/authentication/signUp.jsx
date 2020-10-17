@@ -13,6 +13,7 @@ const SignUp = (props) => {
 
     const handleSignUp = useCallback(async event => {
         event.preventDefault();
+        setLoading(true)
         const { fullName, email, p1, p2, type, desc, veg, non_veg } = event.target.elements;
 
         const foodTypeArray = []
@@ -47,11 +48,15 @@ const SignUp = (props) => {
 
                     const response = await axios.post('/api/auth/register', signupObjectForRestaurant)
                     if (response.data.status === 200) {
-                        props.mountUserToStore(response.data.data)
+                        if (response.data.data.type === "user") {
+                            props.mountUser(response.data.data)
+                        } else {
+                            props.mountRestaurant(response.data.data)
+                        }
                         setRedirectToMainPage(true)
                     } else {
                         await firebase.auth().signOut()
-                        alert('signup failed! try again..')
+                        alert(response.data.message)
                     }
                 } else if (type.value === 'user') {
                     const signupObjectForUser= {
@@ -78,6 +83,7 @@ const SignUp = (props) => {
         } else {
             alert("password did not match!")
         }
+        setLoading(false)
     }, [props.currentlyLoggedIn]);
 
     if (firebase.auth().currentUser !== null) {
@@ -188,7 +194,8 @@ const SignUp = (props) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        mountUserToStore: (user) => { dispatch({ type: "MOUNT_USER", user }) }
+        mountUser: (user) => { dispatch({ type: "MOUNT_USER", user }) },
+        mountRestaurant: (restaurant) => { dispatch({ type: "MOUNT_RESTAURANT", restaurant }) }
     }
 }
 

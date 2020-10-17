@@ -21,9 +21,9 @@ function Navigation(props) {
     const toggle = () => setIsOpen(!isOpen);
 
     useEffect(() => {
-        console.log(props.user, props.currentlyLoggedIn)
         async function checkForUserAuthenticity() {
-            const currentUser = firebase.auth().currentUser
+            const currentUser = await firebase.auth().currentUser
+            console.log(currentUser)
             if (currentUser) {
                 const fetchUserData = await axios.get(`/api/auth/get_user_details/${await currentUser.getIdToken()}`)
                 console.log(fetchUserData)
