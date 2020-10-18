@@ -16,6 +16,7 @@ import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ViewCartModal from "../modals/viewCartModal";
 import AddDishToCartModal from "../modals/addDishToCart";
+import ViewSalesModal from "../modals/viewSalesModal";
 
 function Navigation(props) {
     let location  = useLocation()
@@ -24,10 +25,14 @@ function Navigation(props) {
     const [cU, setCurrentUser]  = useState(null)
     const [openToShowCart, setOpenToShowCart] = useState(false)
     const [openToAddDish, setOpenToAddDish] = useState(false)
+    const [openSalesModal, setOpenSalesModal] = useState(false)
     const [cart, setCart] = useState([])
+    const [sales, setSales] = useState([])
+    const [noDateMessageForSales, setNoDateMessageForSales] = useState("")
     const [currentUserType, setCurrentUserType] = useState("restaurant")
 
     const toggle = () => setIsOpen(!isOpen);
+    const openSalesToggle = () => setOpenSalesModal(!openSalesModal)
     const openCartToggle = () => setOpenToShowCart(!openToShowCart)
     const openMenuToggle = () => setOpenToAddDish(!openToAddDish)
 
@@ -108,6 +113,39 @@ function Navigation(props) {
                     }
                 } else if (response.data.data.type === "restaurant") {
                     alert("You are logged in as Restaurant. Kindly login as a user to view cart...")
+                }
+            } else {
+                alert(response.data.message)
+            }
+        } else {
+            alert('You are not logged in! login first...')
+        }
+    }
+
+    const open_modal_to_view_sales = async (e) => {
+        e.preventDefault()
+
+        let token = null;
+        if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            token = await firebase.auth().currentUser.getIdToken()
+        }
+
+        if (token !== null) {
+
+            const response = await axios.get(`/api/auth/get_user_details/${token}`)
+            if (response.data.status === 200) {
+                if (response.data.data.type === "restaurant") {
+                    openSalesToggle()
+                    const res = await axios.get(`/api/restaurant/get_sale_history_details/${token}`)
+                    console.log(res)
+                    if (res.data.status !== 200) {
+                        setNoDateMessageForSales(res.data.message)
+                        alert(res.data.message)
+                    } else {
+                        await setSales(res.data.data)
+                    }
+                } else if (response.data.data.type === "user") {
+                    alert("You are logged in as User. Kindly login as a Restaurant to add item to menu...")
                 }
             } else {
                 alert(response.data.message)
@@ -226,11 +264,17 @@ function Navigation(props) {
                                 <Button
                                     outline
                                     color="primary"
-                                    onClick={open_modal_to_add_dish}
+                                    onClick={open_modal_to_view_sales}
                                     className="rest_cookie"
                                 >
                                     View Sales
                                 </Button>
+                                <ViewSalesModal
+                                    openSalesModal={openSalesModal}
+                                    openSalesToggle={() => openSalesToggle()}
+                                    sales={sales}
+                                    noDataMessage={noDateMessageForSales}
+                                />
                                 <Button
                                     outline
                                     color="info"

@@ -50,15 +50,16 @@ const getPastOrdersDetails = async (restaurant_access_token) => {
             // first the user name and secondly the item that user purchased
             // from that restaurant
             orderHistory.push({
-                [user["_id"]]: {
-                    name: user["name"],
-                    items_ordered: dish
-                }
+                name: user["name"],
+                items_ordered: dish
             })
         }
     }
     // return the final array obtained
-    return orderHistory
+    return {
+        status: 200,
+        data: orderHistory
+    }
 }
 
 module.exports = getPastOrdersDetails
