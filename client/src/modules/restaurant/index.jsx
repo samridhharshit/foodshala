@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { Alert, Button } from "reactstrap";
 import axios from 'axios'
 import { connect } from 'react-redux'
-import AddDishToMenuModal from "../modals/addDishToMenuModal";
 import AddDishToCartModal from "../modals/addDishToCart";
 import * as firebase from "firebase";
 
@@ -30,12 +29,16 @@ function RestaurantMenu() {
 
 
 
+    // implements when component mounts
     useEffect(() => {
         async function getItems() {
+            // fetch all items for a restaurant
             const response = await axios.get(`/api/restaurant/get_items/${id}`)
             if (response.data.status === 200) {
+                // set the menu list
                 await setMenuList(response.data.data)
             } else {
+                // if no item then display the add dish to menu view
                 await setEmptyMenuMessage(response.data.message)
             }
             setLoading(false)
@@ -45,47 +48,62 @@ function RestaurantMenu() {
 
     const addDishToUserCart = async (e, dish) => {
         e.preventDefault()
+
+        // check if token is available
         let token = null;
+        // if user is logged in or not
         if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
             token = await firebase.auth().currentUser.getIdToken()
         }
+
         if (token !== null) {
+
+            // if user is logged in then fetch user details
             const response = await axios.get(`/api/auth/get_user_details/${token}`)
             if (response.data.status === 200) {
+
+                // if user is a user
                 if (response.data.data.type === "user") {
-                    console.log(dish)
+                    // then  allow the user to add dish to cart
                     const response = await axios.post('/api/user/order_food', {
                         foodId: dish._id,
                         access_token: token,
                         restaurantId: id
                     })
+
                     if (response.data.status === 200) {
+
                         await setItemName(`${dish.name}`)
                         await setVisible(!visible)
                     } else {
+
                         await setErrorInCartAdditionMessage(`${response.data.message}`)
                         await setErrorVisible(!errorVisible)
                     }
+                // if user is a restaurant, then  restrict from adding item to cart. prompt with an alert
                 } else if (response.data.data.type === "restaurant") {
+
                     alert("You are logged in as Restaurant. Kindly login as a user to view cart...")
                 }
             } else {
+                // if there is some error while fetching data. prompt an alert with the message from backend
                 alert(response.data.message)
             }
         } else {
+            // if token is invalid, then prompt the user to login first
             alert('You are not logged in! login first...')
         }
     }
 
     const addDishToCartFormSubmit = async (e) => {
+
         e.preventDefault()
         const { name, price, type, desc } = e.target.elements
-        console.log(name.value, price.value, type.value, desc.value)
-
+        // if user is logged in then fetch user details
         let token = null;
         if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            // if user is a user then  allow the user to add dish to cart
             token = await firebase.auth().currentUser.getIdToken()
-
             const response = await axios.post('/api/restaurant/addItem', {
                 name: name.value,
                 desc: desc.value,
@@ -93,32 +111,38 @@ function RestaurantMenu() {
                 type: type.value,
                 access_token: token
             })
-            console.log(response)
 
             alert(`${response.data.message}`)
             openMenuToggle()
         } else {
+            // if token is invalid, then prompt the user to login first
             alert('token not valid. please logout once and again login...')
         }
     }
 
     const checkForRestaurant = async (e) => {
         e.preventDefault()
+        // if user is logged in then fetch user details
         let token = null;
         if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            // if user is a restaurant then open the add dish menu modal
             token = await firebase.auth().currentUser.getIdToken()
-
             const response = await axios.get(`/api/auth/get_user_details/${token}`)
-            console.log(response.data)
+
             if (response.data.status === 200) {
+
                 if (response.data.data.type === "user") {
+
                     alert('you have logged in with a user\'s account. Kindly log in as a restaurant to add item to menu list...')
                 } else if (response.data.data.type === "restaurant"){
+
                     openMenuToggle()
                 } else {
+
                     alert('login first')
                 }
             } else {
+                // if some error in fetching data. alert with the messgage from backend
                 alert('Restaurant not found!.')
             }
         }

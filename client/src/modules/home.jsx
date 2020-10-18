@@ -1,13 +1,10 @@
 import React, {useEffect, useState} from "react";
 import axios from 'axios'
 import { Link } from "react-router-dom";
-import * as firebase from "firebase";
-import Navigation from "./navigation";
 
 const Home = () => {
     const [loading, setLoading] = useState(true)
     const [restaurants, setRestaurants] = useState(null)
-    const [currentUser, setCurrentUser] = useState(null)
 
     useEffect(() => {
         async function getAllRestaurants() {
