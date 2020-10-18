@@ -54,38 +54,42 @@ const Login = (props) => {
     }
 
     return (
-        <div className="container col-6 align-content-center registration">
-            <h1>Can't wait to see you on the other side!</h1>
-            <form onSubmit={handleLogin}>
-                <div className="form-group input-group">
-                    <label htmlFor="email">Email address</label>
-                    <input
-                        name="email"
-                        type="email"
-                        id="email"
-                        aria-describedby="emailHelp"
-                        required={true}
-                    />
+        <div className="row">
+            <div className="col-sm-12 signup-login-container">
+                <div className="col-sm-10 col-md-8 col-lg-6 align-content-center registration">
+                    <h1>Can't wait to see you on the other side!</h1>
+                    <form onSubmit={handleLogin}>
+                        <div className="form-group input-group">
+                            <label htmlFor="email">Email address</label>
+                            <input
+                                name="email"
+                                type="email"
+                                id="email"
+                                aria-describedby="emailHelp"
+                                required={true}
+                            />
+                        </div>
+                        <div className="form-group input-group">
+                            <label htmlFor="password">Password</label>
+                            <input
+                                name="password"
+                                type="password"
+                                id="password"
+                                required={true}
+                            />
+                        </div>
+                        {
+                            loading ? (
+                                <button type="submit" className="btn btn-primary">logging you in...</button>
+                            ) : (
+                                <button type="submit" className="btn btn-primary">Login</button>
+                            )
+                        }
+                    </form>
+                    <br />
+                    <p>Don't have an account? No worries, <Link to={'/signup'}>Click here </Link>to register..</p>
                 </div>
-                <div className="form-group input-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        name="password"
-                        type="password"
-                        id="password"
-                        required={true}
-                    />
-                </div>
-                {
-                    loading ? (
-                        <button type="submit" className="btn btn-primary">logging you in...</button>
-                    ) : (
-                        <button type="submit" className="btn btn-primary">Login</button>
-                    )
-                }
-            </form>
-            <br />
-            <p>Don't have an account? No worries, <Link to={'/signup'}>Click here </Link>to register..</p>
+            </div>
         </div>
     );
 };

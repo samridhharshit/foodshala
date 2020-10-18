@@ -92,104 +92,108 @@ const SignUp = (props) => {
 
     return (
         <>
-            <div className="container col-6 align-content-center registration">
-                <h1>Signup as a User or Restaurant...</h1>
-                <form onSubmit={handleSignUp}>
-                    <div className="form-group input-group">
-                        <label htmlFor="fullName">Full Name</label>
-                        <input
-                            name="fullName"
-                            type="text"
-                            id="fullName"
-                            required={true}
-                        />
+            <div className="row">
+                <div className="col-sm-12 signup-login-container">
+                    <div className="col-sm-10 col-md-8 col-lg-6 align-content-center registration">
+                        <h1>Signup as a User or Restaurant...</h1>
+                        <form onSubmit={handleSignUp}>
+                            <div className="form-group input-group">
+                                <label htmlFor="fullName">Full Name</label>
+                                <input
+                                    name="fullName"
+                                    type="text"
+                                    id="fullName"
+                                    required={true}
+                                />
+                            </div>
+                            <div className="form-group input-group">
+                                <label htmlFor="email">Email address</label>
+                                <input
+                                    name="email"
+                                    type="email"
+                                    id="email"
+                                    aria-describedby="emailHelp"
+                                    required={true}
+                                />
+                            </div>
+                            <div className="form-group input-group">
+                                <label htmlFor="p1">Password</label>
+                                <input
+                                    name="p1"
+                                    type="password"
+                                    id="p1"
+                                    required={true}
+                                />
+                            </div>
+                            <div className="form-group input-group">
+                                <label htmlFor="p2">Confirm Password</label>
+                                <input
+                                    name="p2"
+                                    type="password"
+                                    id="p2"
+                                    required={true}
+                                />
+                            </div>
+                            <div className="form-group input-group">
+                                <label htmlFor="type">Type</label>
+                                <select
+                                    className="select"
+                                    name="type"
+                                    id="type"
+                                    defaultValue="restaurant"
+                                    required={true}
+                                >
+                                    <option value="restaurant">Restaurant</option>
+                                    <option value="user">Customer</option>
+                                </select>
+                            </div>
+                            <div className="form-group input-group">
+                                <label htmlFor="desc">If opted Restaurant. Let us know more about it.</label>
+                                <input
+                                    style={{"width": "100%"}}
+                                    type="text"
+                                    id="desc"
+                                    name="desc"
+                                />
+                            </div>
+                            <div className="form-group input-group">
+                                <label htmlFor="veg">Do you prefer veg?</label>
+                                <select
+                                    className="select"
+                                    name="veg"
+                                    id="veg"
+                                    defaultValue="yes"
+                                    required={true}
+                                >
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                            <div className="form-group input-group">
+                                <label htmlFor="non-veg">Do you prefer Non-veg?</label>
+                                <select
+                                    className="select"
+                                    name="non_veg"
+                                    id="non-veg"
+                                    defaultValue="yes"
+                                    required={true}
+                                >
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                            {
+                                loading ? (
+                                    <button type="submit" className="btn btn-primary">Signing you up...</button>
+                                ) : (
+                                    <button type="submit" className="btn btn-primary">Submit</button>
+                                )
+                            }
+                        </form>
+                        <br />
+                        <p>Already registered with us?<Link to={'/login'}>Login here...</Link></p>
                     </div>
-                    <div className="form-group input-group">
-                        <label htmlFor="email">Email address</label>
-                        <input
-                            name="email"
-                            type="email"
-                            id="email"
-                            aria-describedby="emailHelp"
-                            required={true}
-                        />
-                    </div>
-                    <div className="form-group input-group">
-                        <label htmlFor="p1">Password</label>
-                        <input
-                            name="p1"
-                            type="password"
-                            id="p1"
-                            required={true}
-                        />
-                    </div>
-                    <div className="form-group input-group">
-                        <label htmlFor="p2">Confirm Password</label>
-                        <input
-                            name="p2"
-                            type="password"
-                            id="p2"
-                            required={true}
-                        />
-                    </div>
-                    <div className="form-group input-group">
-                        <label htmlFor="type">Type</label>
-                        <select
-                            className="select"
-                            name="type"
-                            id="type"
-                            defaultValue="restaurant"
-                            required={true}
-                        >
-                            <option value="restaurant">Restaurant</option>
-                            <option value="user">Customer</option>
-                        </select>
-                    </div>
-                    <div className="form-group input-group">
-                        <label htmlFor="desc">If opted Restaurant. Let us know more about it.</label>
-                        <input
-                            style={{"width": "100%"}}
-                            type="text"
-                            id="desc"
-                            name="desc"
-                        />
-                    </div>
-                    <div className="form-group input-group">
-                        <label htmlFor="veg">Do you prefer veg?</label>
-                        <select
-                            className="select"
-                            name="veg"
-                            id="veg"
-                            defaultValue="yes"
-                            required={true}
-                        >
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-                    <div className="form-group input-group">
-                        <label htmlFor="non-veg">Do you prefer Non-veg?</label>
-                        <select
-                            className="select"
-                            name="non_veg"
-                            id="non-veg"
-                            defaultValue="yes"
-                            required={true}
-                        >
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-                    {
-                        loading ? (
-                            <button type="submit" className="btn btn-primary">Signing you up...</button>
-                        ) : (
-                            <button type="submit" className="btn btn-primary">Submit</button>
-                        )
-                    }
-                </form>
-                <br />
-                <p>Already registered with us?<Link to={'/login'}>Login here...</Link></p>
+                </div>
             </div>
         </>
     );

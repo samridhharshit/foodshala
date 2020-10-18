@@ -72,6 +72,12 @@ body {
 }
 
 /* menu page */
+.signup-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .login{
   padding: 2%;
   margin-top: 10%;
@@ -187,10 +193,16 @@ body {
 }
 
 .logout-cart {
-  width: 200px;
+  width: 500px;
   display: inline-flex;
   justify-content: space-between;
   align-items: center
+}
+
+@media (max-width: 456px) {
+  .logout-cart {
+    width: 100%;
+  }
 }
 
 .cart_view {

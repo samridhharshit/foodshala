@@ -5,13 +5,14 @@ import {
     Navbar,
     NavbarToggler,
     NavbarBrand,
-    Nav
+    Nav,
+    Badge
 } from 'reactstrap';
 import {Link, useLocation} from 'react-router-dom'
 import * as firebase from "firebase";
 import axios from 'axios'
 import { connect } from 'react-redux'
-import { faCartPlus, faCookie } from "@fortawesome/free-solid-svg-icons";
+import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ViewCartModal from "../modals/viewCartModal";
 import AddDishToCartModal from "../modals/addDishToCart";
@@ -188,9 +189,16 @@ function Navigation(props) {
                         cU === null ? (
                             <Link
                                 to='/signup'
-                                className="login-signup">
-                                Signup/Login
+                                // className="login-signup"
+                            >
+                                <Button
+                                    outline
+                                    color="secondary"
+                                >
+                                    Signup/Login
+                                </Button>
                             </Link>
+
                         ) : currentUserType === "user" ? (
 
                             <div  className="logout-cart">
@@ -216,23 +224,34 @@ function Navigation(props) {
                         ) : (
                             <div  className="logout-cart">
                                 <Button
-                                    color="warning"
+                                    outline
+                                    color="primary"
                                     onClick={open_modal_to_add_dish}
                                     className="rest_cookie"
                                 >
-                                    <FontAwesomeIcon icon={faCookie} size="2x" />
+                                    View Sales
+                                </Button>
+                                <Button
+                                    outline
+                                    color="info"
+                                    onClick={open_modal_to_add_dish}
+                                    className="rest_cookie"
+                                >
+                                    Add to menu
                                 </Button>
                                 <AddDishToCartModal
                                     openToAddDish={openToAddDish}
                                     openMenuToggle={() => openMenuToggle()}
                                     addDishToCartFormSubmit={addDishToCartFormSubmit}
                                 />
-                                <button
+                                <Button
+                                    outline
+                                    color="danger"
                                     onClick={handleLogout}
-                                    className="login-signup"
+                                    // className="login-signup"
                                 >
                                     Logout
-                                </button>
+                                </Button>
                             </div>
                         )
                     }
