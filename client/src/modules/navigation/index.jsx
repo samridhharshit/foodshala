@@ -7,20 +7,31 @@ import {
     NavbarBrand,
     Nav
 } from 'reactstrap';
-import {Link, Redirect} from 'react-router-dom'
+import {Link, useLocation} from 'react-router-dom'
 import * as firebase from "firebase";
 import axios from 'axios'
 import { connect } from 'react-redux'
-import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCartPlus, faCookie } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ViewCartModal from "../modals/viewCartModal";
+import AddDishToCartModal from "../modals/addDishToCart";
 
 function Navigation(props) {
+    let location  = useLocation()
+
     const [isOpen, setIsOpen] = useState(false);
     const [cU, setCurrentUser]  = useState(null)
+    const [openToShowCart, setOpenToShowCart] = useState(false)
+    const [openToAddDish, setOpenToAddDish] = useState(false)
+    const [cart, setCart] = useState([])
+    const [currentUserType, setCurrentUserType] = useState("restaurant")
 
     const toggle = () => setIsOpen(!isOpen);
+    const openCartToggle = () => setOpenToShowCart(!openToShowCart)
+    const openMenuToggle = () => setOpenToAddDish(!openToAddDish)
 
     useEffect(() => {
+        console.log(props.user, props.restaurant)
         async function checkForUserAuthenticity() {
             const currentUser = await firebase.auth().currentUser
             console.log(currentUser)
@@ -31,9 +42,10 @@ function Navigation(props) {
                 if (fetchUserData.data.status === 200) {
                     setCurrentUser(fetchUserData.data.data)
                     if (fetchUserData.data.data.type === "user") {
-                        props.mountUserToStore(fetchUserData.data.data)
+                        setCurrentUserType("user")
+                        await props.mountUserToStore(fetchUserData.data.data)
                     } else {
-                        props.mountRestaurantToStore(fetchUserData.data.data)
+                        await props.mountRestaurantToStore(fetchUserData.data.data)
                     }
                 } else {
                     await firebase.auth().signOut()
@@ -61,17 +73,99 @@ function Navigation(props) {
         console.log(status)
 
         if (props.currentlyLoggedIn === "user") {
-            props.unmountUser()
+            await props.unmountUser()
         } else {
-            props.unmountRestaurant()
+            await props.unmountRestaurant()
         }
         await firebase.auth().signOut()
         await setCurrentUser(null)
     }
 
-    const show_cart = (e) => {
+    const show_cart = async (e) => {
         e.preventDefault()
-        console.log('showing cart')
+        let token = null;
+        if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            token = await firebase.auth().currentUser.getIdToken()
+        }
+        if (token !== null) {
+            const response = await axios.get(`/api/auth/get_user_details/${token}`)
+            if (response.data.status === 200) {
+
+                if (response.data.data.type === "user") {
+
+                    const response = await axios.post('/api/user/viewOrders', {
+                        access_token: token,
+                        restaurant_id: location.pathname.split('/')[2]
+                    })
+                    console.log(response)
+
+                    if (response.data.status !== 200) {
+                        alert(response.data.message)
+                    } else {
+                        await setCart(response.data.data)
+                        openCartToggle()
+                    }
+                } else if (response.data.data.type === "restaurant") {
+                    alert("You are logged in as Restaurant. Kindly login as a user to view cart...")
+                }
+            } else {
+                alert(response.data.message)
+            }
+        } else {
+            alert('You are not logged in! login first...')
+        }
+    }
+
+    const open_modal_to_add_dish = async (e) => {
+        e.preventDefault()
+
+        let token = null;
+        if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            token = await firebase.auth().currentUser.getIdToken()
+        }
+
+        if (token !== null) {
+
+            const response = await axios.get(`/api/auth/get_user_details/${token}`)
+            if (response.data.status === 200) {
+                if (response.data.data.type === "restaurant") {
+                    openMenuToggle()
+                } else if (response.data.data.type === "user") {
+                    alert("You are logged in as User. Kindly login as a Restaurant to add item to menu...")
+                }
+            } else {
+                alert(response.data.message)
+            }
+        } else {
+            alert('You are not logged in! login first...')
+        }
+
+    }
+
+    const addDishToCartFormSubmit = async (e) => {
+        e.preventDefault()
+        const { name, price, type, desc } = e.target.elements
+        console.log(name.value, price.value, type.value, desc.value)
+
+        let token = null;
+        if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            token = await firebase.auth().currentUser.getIdToken()
+
+            const response = await axios.post('/api/restaurant/addItem', {
+                name: name.value,
+                desc: desc.value,
+                price: price.value,
+                type: type.value,
+                access_token: token
+            })
+            console.log(response)
+
+            alert(`${response.data.message}`)
+            openMenuToggle()
+        } else {
+            alert('token not valid. please logout once and again login...')
+        }
+
     }
 
     return (
@@ -97,7 +191,8 @@ function Navigation(props) {
                                 className="login-signup">
                                 Signup/Login
                             </Link>
-                        ) : (
+                        ) : currentUserType === "user" ? (
+
                             <div  className="logout-cart">
                                 <Button
                                     color="warning"
@@ -106,6 +201,32 @@ function Navigation(props) {
                                 >
                                     <FontAwesomeIcon icon={faCartPlus} size="2x" />
                                 </Button>
+                                <ViewCartModal
+                                    openToShowCart={openToShowCart}
+                                    openCartToggle={() => openCartToggle()}
+                                    cart={cart}
+                                />
+                                <button
+                                    onClick={handleLogout}
+                                    className="login-signup"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <div  className="logout-cart">
+                                <Button
+                                    color="warning"
+                                    onClick={open_modal_to_add_dish}
+                                    className="rest_cookie"
+                                >
+                                    <FontAwesomeIcon icon={faCookie} size="2x" />
+                                </Button>
+                                <AddDishToCartModal
+                                    openToAddDish={openToAddDish}
+                                    openMenuToggle={() => openMenuToggle()}
+                                    addDishToCartFormSubmit={addDishToCartFormSubmit}
+                                />
                                 <button
                                     onClick={handleLogout}
                                     className="login-signup"
@@ -140,4 +261,3 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navigation)
-

@@ -8,7 +8,11 @@ const items = require('../../database/models/items')
 const orderFood = async (details) => {
     let restaurantId
     // check if token exists or not ie user is logged in or not
-    if (details.access_token === null || details.access_token === undefined || details.access_token === "") {
+    if (
+        details.access_token === null ||
+        details.access_token === undefined ||
+        details.access_token === ""
+    ) {
         return {
             status: 403,
             message: "Access forbidden. Login first"
@@ -61,9 +65,10 @@ const orderFood = async (details) => {
             foodId: item._id
         })
         //save order
-        newOrder.save()
+
         return {
             status: 200,
+            data: await newOrder.save(),
             message: "order added!"
         }
     } else {// when incorrect format for restaurant id is provided

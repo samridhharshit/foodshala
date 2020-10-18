@@ -1,13 +1,13 @@
 const initState = {
-    user: null,
-    restaurant: null,
-    cart: null,
+    user: {},
+    restaurant: {},
     currentlyLoggedIn: null
 }
 
 const rootReducer = (state = initState, action) => {
     switch (action.type) {
-        case "MOUNT_USER": return {
+        case "MOUNT_USER":
+            return {
             ...state,
             user: action.user,
             currentlyLoggedIn: "user"
@@ -19,17 +19,13 @@ const rootReducer = (state = initState, action) => {
         }
         case "UNMOUNT_USER": return {
             ...state,
-            user: null,
+            user: {},
             currentlyLoggedIn: null
         }
         case "UNMOUNT_RESTAURANT": return {
             ...state,
-            restaurant: null,
+            restaurant: {},
             currentlyLoggedIn: null
-        }
-        case "UPDATE_CART": return {
-            ...state,
-            cart: action.cart
         }
         default: return state
     }

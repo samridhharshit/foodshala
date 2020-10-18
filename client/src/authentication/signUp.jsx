@@ -138,6 +138,7 @@ const SignUp = (props) => {
                             className="select"
                             name="type"
                             id="type"
+                            defaultValue="restaurant"
                             required={true}
                         >
                             <option value="restaurant">Restaurant</option>
@@ -159,6 +160,7 @@ const SignUp = (props) => {
                             className="select"
                             name="veg"
                             id="veg"
+                            defaultValue="yes"
                             required={true}
                         >
                             <option value="yes">Yes</option>
@@ -171,6 +173,7 @@ const SignUp = (props) => {
                             className="select"
                             name="non_veg"
                             id="non-veg"
+                            defaultValue="yes"
                             required={true}
                         >
                             <option value="yes">Yes</option>

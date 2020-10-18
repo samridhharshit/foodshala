@@ -1,34 +1,36 @@
 import React, {useEffect, useState} from 'react'
-import {Redirect, useParams} from "react-router-dom";
-import { Button } from "reactstrap";
+import { useParams } from "react-router-dom";
+import { Alert, Button } from "reactstrap";
 import axios from 'axios'
 import { connect } from 'react-redux'
 import AddDishToMenuModal from "../modals/addDishToMenuModal";
 import AddDishToCartModal from "../modals/addDishToCart";
-import LoginRestaurantModal from "../modals/loginRestaurantModal";
-import UserLoginModal from "../modals/userLoginModal";
+import * as firebase from "firebase";
 
-function RestaurantMenu(props) {
+function RestaurantMenu() {
     let { id } = useParams()
-    const [login, setLogin] = useState(false)
 
+    const [loading, setLoading] = useState(true)
     const [addDishToMenuModal, setAddDishToMenuModal] = useState(false)
     const [addDishToCartModal, setAddDishToCartModal] = useState(false)
-    const [userLoginModal, setUserLoginModal] = useState(false)
-    const [restaurantLoginModal, setRestaurantLoginModal] = useState(false)
-    const [loading, setLoading] = useState(true)
     const [menuList , setMenuList] = useState(null)
     const [emptyMenuMessage, setEmptyMenuMessage] = useState(null)
+    const [visible, setVisible] = useState(false)
+    const [errorVisible, setErrorVisible] = useState(false)
+    const [itemName, setItemName] = useState(null)
+    const [errorInCartAdditionMessage, setErrorInCartAdditionMessage] = useState(null)
+    const [openToAddDish, setOpenToAddDish] = useState(false)
+
+    const onDismiss = () => setVisible(false);
+    const onErrorDismiss = () => setErrorVisible(false)
 
     const addDishToMenuToggle = () => setAddDishToMenuModal(!addDishToMenuModal)
     const addDishToCartToggle = () => setAddDishToCartModal(!addDishToCartModal)
-    const loginRestaurantToggle = () => setRestaurantLoginModal(!restaurantLoginModal)
-    const loginUserToggle = () => setUserLoginModal(!userLoginModal)
+    const openMenuToggle = () => setOpenToAddDish(!openToAddDish)
 
 
 
     useEffect(() => {
-        console.log(props.user, props.outlet)
         async function getItems() {
             const response = await axios.get(`/api/restaurant/get_items/${id}`)
             if (response.data.status === 200) {
@@ -39,62 +41,86 @@ function RestaurantMenu(props) {
             setLoading(false)
         }
         getItems()
-    }, [loading])
+    }, [])
 
-    const handleCartModalSubmit = (e) => {
-        alert('handle cart modal submit')
-    }
-
-    const handleUserLogin = (e) => {
-        alert('handle user login modal submit')
-        const { email, password } = e.target.elements
-        if (email.name !== "sign_up_email" && password.name === "sign_up_password") {
-            //@TODO process login for user
-        }
-    }
-
-    const authorizeUserToAddDishToCart = async (e) => {
+    const addDishToUserCart = async (e, dish) => {
         e.preventDefault()
-        if (props.user.access_token) {
-            const user = await axios.get(`/api/user/get_user_details/${props.user.access_token}`)
-            console.log(user)
-            if (user.data.status === 200) {
-                addDishToCartToggle()
+        let token = null;
+        if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            token = await firebase.auth().currentUser.getIdToken()
+        }
+        if (token !== null) {
+            const response = await axios.get(`/api/auth/get_user_details/${token}`)
+            if (response.data.status === 200) {
+                if (response.data.data.type === "user") {
+                    console.log(dish)
+                    const response = await axios.post('/api/user/order_food', {
+                        foodId: dish._id,
+                        access_token: token,
+                        restaurantId: id
+                    })
+                    if (response.data.status === 200) {
+                        await setItemName(`${dish.name}`)
+                        await setVisible(!visible)
+                    } else {
+                        await setErrorInCartAdditionMessage(`${response.data.message}`)
+                        await setErrorVisible(!errorVisible)
+                    }
+                } else if (response.data.data.type === "restaurant") {
+                    alert("You are logged in as Restaurant. Kindly login as a user to view cart...")
+                }
             } else {
-                // loginUserToggle()
-                setLogin(!login)
+                alert(response.data.message)
             }
         } else {
-            alert('You are not logged in! Login as a user to add item to your cart.')
-            // loginUserToggle()
-            setLogin(!login)
+            alert('You are not logged in! login first...')
         }
     }
 
-    const handleDishAdditionToRestaurantMenu = (e) => {
+    const addDishToCartFormSubmit = async (e) => {
         e.preventDefault()
-        console.log('submitting form')
+        const { name, price, type, desc } = e.target.elements
+        console.log(name.value, price.value, type.value, desc.value)
 
-    }
+        let token = null;
+        if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            token = await firebase.auth().currentUser.getIdToken()
 
-    const handleRestaurantLogin = (e) => {
-        e.preventDefault()
-        const { email, password } = e.target.elements
-        if (email.name !== "sign_up_email" && password.name === "sign_up_password") {
-            //@TODO process login for restaurant
-        }
-    }
+            const response = await axios.post('/api/restaurant/addItem', {
+                name: name.value,
+                desc: desc.value,
+                price: price.value,
+                type: type.value,
+                access_token: token
+            })
+            console.log(response)
 
-    const checkForRestaurantOfficial = async (e) => {
-        e.preventDefault()
-        const outlet = await axios.get(`/api/restaurant/get_restaurant_details/${props.outlet.access_token}`)
-        console.log(outlet)
-        if (outlet.data.status === 200) {
-            addDishToMenuToggle()
+            alert(`${response.data.message}`)
+            openMenuToggle()
         } else {
-            alert('You are not logged in! Login as a Restaurant official to add item to your menu.')
-            // loginRestaurantToggle()
-            setLogin(!login)
+            alert('token not valid. please logout once and again login...')
+        }
+    }
+
+    const checkForRestaurant = async (e) => {
+        e.preventDefault()
+        let token = null;
+        if (await firebase.auth().currentUser && await firebase.auth().currentUser.getIdToken()) {
+            token = await firebase.auth().currentUser.getIdToken()
+
+            const response = await axios.get(`/api/auth/get_user_details/${token}`)
+            console.log(response.data)
+            if (response.data.status === 200) {
+                if (response.data.data.type === "user") {
+                    alert('you have logged in with a user\'s account. Kindly log in as a restaurant to add item to menu list...')
+                } else if (response.data.data.type === "restaurant"){
+                    openMenuToggle()
+                } else {
+                    alert('login first')
+                }
+            } else {
+                alert('Restaurant not found!.')
+            }
         }
     }
 
@@ -108,10 +134,6 @@ function RestaurantMenu(props) {
         )
     }
 
-    if (login) {
-        return <Redirect to={'/login'} />
-    }
-
     if (emptyMenuMessage) {
         return (
             <div className="container col-lg-9 align-content-center">
@@ -119,22 +141,17 @@ function RestaurantMenu(props) {
                     <h4>{emptyMenuMessage}</h4>
                 </div>
                 <Button
-                    onClick={checkForRestaurantOfficial}
+                    onClick={checkForRestaurant}
                     className="add-dish"
                     size="lg"
                     block
                 >
-                    If you are the restaurant manager. Add your first dish here...
+                    If you are the restaurant manager. Kindly login with the restaurant's credentials and add your first dish here...
                 </Button>
-                <AddDishToMenuModal
-                    addDishToMenuModal={addDishToMenuModal}
-                    addDishToMenuToggle={() => addDishToMenuToggle()}
-                    handleDishAdditionToRestaurantMenu={handleDishAdditionToRestaurantMenu}
-                />
-                <LoginRestaurantModal
-                    restaurantLoginModal={restaurantLoginModal}
-                    loginRestaurantToggle={() => loginRestaurantToggle()}
-                    handleRestaurantLogin={handleRestaurantLogin}
+                <AddDishToCartModal
+                    openToAddDish={openToAddDish}
+                    openMenuToggle={() => openMenuToggle()}
+                    addDishToCartFormSubmit={addDishToCartFormSubmit}
                 />
             </div>
         )
@@ -146,6 +163,12 @@ function RestaurantMenu(props) {
                 <div className="list_story_header fixed-top">
                     <h1 className={'homelink logo'}>Select item from below menu</h1>
                 </div>
+                <Alert color="success" isOpen={visible} toggle={onDismiss}>
+                    {itemName} added to your cart!
+                </Alert>
+                <Alert color="success" isOpen={errorVisible} toggle={onErrorDismiss}>
+                    {errorInCartAdditionMessage}
+                </Alert>
                 {
                     menuList.map(menu => (
                         <div
@@ -176,7 +199,7 @@ function RestaurantMenu(props) {
                                             ) : null
                                         }
                                         <button
-                                            onClick={authorizeUserToAddDishToCart}
+                                            onClick={(e) => addDishToUserCart(e, menu)}
                                             className="footer-button"
                                         >
                                             Move Item to cart
@@ -184,12 +207,6 @@ function RestaurantMenu(props) {
                                         <AddDishToCartModal
                                             addDishToCartModal={addDishToCartModal}
                                             addDishToCartToggle={() => addDishToCartToggle()}
-                                            handleCartModalSubmit={handleCartModalSubmit}
-                                        />
-                                        <UserLoginModal
-                                            userLoginModal={userLoginModal}
-                                            loginUserToggle={() => loginUserToggle()}
-                                            handleUserModalSubmit={handleUserLogin}
                                         />
                                     </div>
                                 </div>
@@ -205,12 +222,9 @@ function RestaurantMenu(props) {
 const mapStateToProps = (state) => {
     return {
         user: state.user,
-        outlet: state.restaurant
+        outlet: state.restaurant,
+        cart: state.cart
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(RestaurantMenu)
+export default connect(mapStateToProps)(RestaurantMenu)
