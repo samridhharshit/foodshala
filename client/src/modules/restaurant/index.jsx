@@ -217,7 +217,7 @@ function RestaurantMenu() {
                                         {
                                             menu.type && menu.type === "non-veg" ? (
                                                 <img
-                                                    src="https://img.icons8.com/fluent/24/000000/non-vegetarian-food-symbol.png"
+                                                    src="https://img.icons8.com/color/48/000000/non-vegetarian-food-symbol.png"
                                                     alt="non-veg"
                                                 />
                                             ) : null
