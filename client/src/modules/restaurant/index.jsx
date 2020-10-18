@@ -215,10 +215,10 @@ function RestaurantMenu() {
                                             ) : null
                                         }
                                         {
-                                            menu.type && menu.type === "non-veg" ? (
+                                            menu.type && menu.type === "non_veg" ? (
                                                 <img
-                                                    src="https://img.icons8.com/color/48/000000/non-vegetarian-food-symbol.png"
-                                                    alt="non-veg"
+                                                    src="https://img.icons8.com/fluent/24/000000/non-vegetarian-food-symbol.png"
+                                                     alt="non-veg"
                                                 />
                                             ) : null
                                         }

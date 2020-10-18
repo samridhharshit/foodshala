@@ -48,11 +48,11 @@ const SignUp = (props) => {
 
                     const response = await axios.post('/api/auth/register', signupObjectForRestaurant)
                     if (response.data.status === 200) {
-                        if (response.data.data.type === "user") {
-                            props.mountUser(response.data.data)
-                        } else {
-                            props.mountRestaurant(response.data.data)
-                        }
+                        // if (response.data.data.type === "user") {
+                        //     props.mountUser(response.data.data)
+                        // } else {
+                        //     props.mountRestaurant(response.data.data)
+                        // }
                         setRedirectToMainPage(true)
                     } else {
                         await firebase.auth().signOut()
@@ -69,7 +69,7 @@ const SignUp = (props) => {
 
                     const response = await axios.post('/api/auth/register', signupObjectForUser)
                     if (response.data.status === 200) {
-                        props.mountUserToStore(response.data.data)
+                        // props.mountUserToStore(response.data.data)
                         setRedirectToMainPage(true)
                     } else {
                         await firebase.auth().signOut()
