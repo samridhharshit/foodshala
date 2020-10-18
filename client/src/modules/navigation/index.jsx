@@ -252,12 +252,13 @@ function Navigation(props) {
                                     openCartToggle={() => openCartToggle()}
                                     cart={cart}
                                 />
-                                <button
+                                <Button
                                     onClick={handleLogout}
-                                    className="login-signup"
+                                    outline
+                                    color="danger"
                                 >
                                     Logout
-                                </button>
+                                </Button>
                             </div>
                         ) : (
                             <div  className="logout-cart">
